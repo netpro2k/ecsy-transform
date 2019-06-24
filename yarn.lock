@@ -1170,9 +1170,9 @@ duplexify@^3.4.2, duplexify@^3.6.0:
     readable-stream "^2.0.0"
     stream-shift "^1.0.0"
 
-"ecsy@https://github.com/fernandojsg/ecsy.git":
+"ecsy@https://github.com/netpro2k/ecsy.git#fix-not-on-remove":
   version "0.1.0"
-  resolved "https://github.com/fernandojsg/ecsy.git#83fde95c2880af63af93e050a99ec3669266ffaf"
+  resolved "https://github.com/netpro2k/ecsy.git#c9e652b3984b5c0b0cbd6102de35db0f629d2e97"
 
 ee-first@1.1.1:
   version "1.1.1"

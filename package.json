@@ -8,7 +8,7 @@
     "start": "cross-env NODE_ENV=development ts-node ./src/server/index.ts"
   },
   "dependencies": {
-    "ecsy": "https://github.com/fernandojsg/ecsy.git",
+    "ecsy": "https://github.com/netpro2k/ecsy.git#fix-not-on-remove",
     "express": "^4.17.1",
     "three": "^0.105.2"
   },
