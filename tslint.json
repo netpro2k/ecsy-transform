@@ -1,19 +1,30 @@
 {
   "extends": [
     "tslint:latest",
-    "tslint-config-prettier"
+    "tslint-config-prettier",
+    "tslint-plugin-prettier"
   ],
   "rules": {
     "member-ordering": false,
     "object-literal-sort-keys": false,
     "ordered-imports": false,
     "interface-name": false,
-    "no-console": [
-      true,
-      "log"
-    ],
+    "no-console": {
+      "severity": "warning",
+      "options": [
+        "debug",
+        "info",
+        "log",
+        "time",
+        "timeEnd",
+        "trace"
+      ]
+    },
     "prefer-for-of": false,
     "forin": false,
-    "max-classes-per-file": false
+    "member-access": false,
+    "max-classes-per-file": false,
+    "prefer-object-spread": false,
+    "no-submodule-imports": false
   }
 }

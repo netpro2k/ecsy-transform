@@ -1,10 +1,11 @@
 import { World, System } from "ecsy";
 import * as THREE from "three";
-import { Matrix4 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
-import * as TransformSystems from "./transform-system";
-import { Rotation, LocalToWorld, Parent, Translation, Scale, LocalToParent } from "./transform-system";
+import * as TransformSystems from "../src/index";
+import { Rotation, LocalToWorld, Parent, Translation, Scale, LocalToParent } from "../src/index";
+
+import { vec3, mat4, quat } from "gl-matrix";
 
 class Rotating {
   public rotatingSpeed: number;
@@ -21,8 +22,6 @@ export class Object3DComponent {
   }
 }
 
-const yAxis = new THREE.Vector3(0, 1, 0);
-const tempQ = new THREE.Quaternion();
 class RotatingSystem extends System {
   public init() {
     return {
@@ -40,8 +39,7 @@ class RotatingSystem extends System {
       const rotation = entity.getMutableComponent(Rotation);
       const rotating = entity.getComponent(Rotating);
 
-      tempQ.setFromAxisAngle(yAxis, rotating.rotatingSpeed * THREE.Math.DEG2RAD * (dt / 100));
-      rotation.rotation.multiply(tempQ);
+      quat.rotateY(rotation.rotation, rotation.rotation, rotating.rotatingSpeed * THREE.Math.DEG2RAD * (dt / 100));
     }
   }
 }
@@ -62,7 +60,7 @@ class Object3DMatrixSystem extends System {
       const o = entity.getMutableComponent(Object3DComponent);
       const t = entity.getComponent(LocalToWorld);
 
-      o.object.matrixWorld.copy(t.matrix);
+      o.object.matrixWorld.fromArray((t.matrix as unknown) as number[]);
     }
   }
 }
@@ -96,7 +94,7 @@ window.addEventListener("resize", () => {
 });
 
 const scene = new THREE.Scene();
-window.s = scene;
+// window.s = scene;
 scene.matrixAutoUpdate = false;
 
 scene.add(new THREE.AmbientLight(0xcccccc));
@@ -124,7 +122,7 @@ const e1 = world
 const e2 = world
   .createEntity()
   .addComponent(LocalToWorld)
-  .addComponent(Translation, { position: new THREE.Vector3(1, 0, 0) })
+  .addComponent(Translation, { position: vec3.fromValues(1, 0, 0) })
   .addComponent(Rotation)
   .addComponent(Scale, { scale: 0.5 })
   .addComponent(LocalToParent)
@@ -139,7 +137,12 @@ const e3 = world
   // .addComponent(Rotation)
   // .addComponent(Scale, { scale: 0.5 })
   .addComponent(LocalToParent, {
-    matrix: new Matrix4().makeTranslation(0, 1, 0).multiply(new Matrix4().makeScale(0.5, 0.5, 0.5))
+    matrix: mat4.fromRotationTranslationScale(
+      mat4.create(),
+      quat.create(),
+      vec3.fromValues(0, 1, 0),
+      vec3.fromValues(0.5, 0.5, 0.5)
+    )
   })
   .addComponent(Parent, { entity: e2 })
   // .addComponent(Rotating, { rotatingSpeed: 5 })

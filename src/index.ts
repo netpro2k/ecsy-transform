@@ -1,25 +1,27 @@
 import { World, System, Entity, Not } from "ecsy";
-import { Vector3, Quaternion, Matrix4 } from "three";
+import { vec3, mat4, quat, glMatrix } from "gl-matrix";
+
+glMatrix.setMatrixArrayType(Array);
 
 export class LocalToWorld {
-  public matrix: Matrix4;
+  public matrix: mat4;
   constructor() {
-    this.matrix = new Matrix4();
+    this.matrix = mat4.create();
   }
 
   public __init() {
-    this.matrix = new Matrix4();
+    this.matrix = mat4.create();
   }
 }
 
 export class LocalToParent {
-  public matrix: Matrix4;
+  public matrix: mat4;
   constructor() {
-    this.matrix = new Matrix4();
+    this.matrix = mat4.create();
   }
 
   public __init() {
-    this.matrix = new Matrix4();
+    this.matrix = mat4.create();
   }
 }
 
@@ -49,23 +51,23 @@ class Child {
 }
 
 export class Rotation {
-  public rotation: Quaternion;
+  public rotation: quat;
   constructor() {
-    this.rotation = new Quaternion();
+    this.rotation = quat.create();
   }
 
   public __init() {
-    this.rotation = new Quaternion();
+    this.rotation = quat.create();
   }
 }
 
 export class Translation {
-  public position: Vector3;
+  public position: vec3;
   constructor() {
-    this.position = new Vector3();
+    this.position = vec3.create();
   }
   public __init() {
-    this.position = new Vector3();
+    this.position = vec3.create();
   }
 }
 
@@ -127,10 +129,10 @@ export class HierarchySystem extends System {
   }
 }
 
-const VEC3_ZERO = new Vector3(0, 0, 0);
-const VEC3_ONE = new Vector3(1, 1, 1);
-const QUAT_IDENTITY = new Quaternion();
-const tempScale = new Vector3();
+const VEC3_ZERO = vec3.fromValues(0, 0, 0);
+const VEC3_ONE = vec3.fromValues(1, 1, 1);
+const QUAT_IDENTITY = quat.create();
+const tempScale = vec3.create();
 
 export class LocalToParentSystem extends System {
   public init() {
@@ -153,10 +155,11 @@ export class LocalToParentSystem extends System {
 
       if (!(r || t || s)) continue;
 
-      m.matrix.compose(
-        t ? t.position : VEC3_ZERO,
+      mat4.fromRotationTranslationScale(
+        m.matrix,
         r ? r.rotation : QUAT_IDENTITY,
-        s ? tempScale.setScalar(s.scale) : VEC3_ONE
+        t ? t.position : VEC3_ZERO,
+        s ? vec3.set(tempScale, s.scale, s.scale, s.scale) : VEC3_ONE
       );
     }
   }
@@ -180,7 +183,7 @@ export class LocalToWorldSystem extends System {
       const child = c.children[i];
       const localToWorld = child.getMutableComponent(LocalToWorld);
       const localToParent = child.getComponent(LocalToParent);
-      localToWorld.matrix.multiplyMatrices(parentLocalToWorld.matrix, localToParent.matrix);
+      mat4.multiply(localToWorld.matrix, parentLocalToWorld.matrix, localToParent.matrix);
       this.updateChildrenLocalToWorld(child, localToWorld);
     }
   }
@@ -196,10 +199,11 @@ export class LocalToWorldSystem extends System {
       const s = entity.getComponent(Scale);
       if (!(r || t || s)) continue;
 
-      m.matrix.compose(
-        t ? t.position : VEC3_ZERO,
+      mat4.fromRotationTranslationScale(
+        m.matrix,
         r ? r.rotation : QUAT_IDENTITY,
-        s ? tempScale.setScalar(s.scale) : VEC3_ONE
+        t ? t.position : VEC3_ZERO,
+        s ? vec3.set(tempScale, s.scale, s.scale, s.scale) : VEC3_ONE
       );
     }
 
