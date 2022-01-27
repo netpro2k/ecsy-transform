@@ -27,7 +27,7 @@
     "@types/gl-matrix": "^2.4.5",
     "ecsy": "https://github.com/netpro2k/ecsy.git#fix-not-on-remove",
     "gl-matrix": "^3.0.0",
-    "three": "^0.105.2"
+    "three": "^0.137.0"
   },
   "devDependencies": {
     "@types/express": "^4.16.1",
